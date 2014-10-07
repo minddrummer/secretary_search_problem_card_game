@@ -107,8 +107,10 @@ class PygButton(object):
             self.setSurfaces(normal, down, highlight)
 
     def handleEvent(self, eventObj):
-        """All MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN event objects
-        created by Pygame should be passed to this method. handleEvent() will
+        """Note that this handleEvent method generates a queue!!!
+        All MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN event objects
+        created by Pygame should be passed to this method. ---pygame will generates these variables, and they are constant passed to handleEvent method here by call.And judged by the first line of Code.
+        handleEvent() will
         detect if the event is relevant to this button and change its state.
 
         There are two ways that your code can respond to button-events. One is

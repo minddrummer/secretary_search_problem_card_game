@@ -80,7 +80,7 @@ class Rect:
 
 pygame.init()
 #Do we need this clock object in this game??
-FPSCLOCK = pygame.time.Clock()
+#FPSCLOCK = pygame.time.Clock()
 Window0 = pygame.display.set_mode((Width, Height))
 pygame.display.set_caption('A Decision Task')
 Window0.fill(BACKGROUND_COLOR)
@@ -102,13 +102,9 @@ click_counter = 0
 
 while running:
     for event in pygame.event.get():
-        #print buttonObj.handleEvent(event)
+        # buttonObj.handleEvent(event) is a queue
         if 'click' in buttonObj.handleEvent(event):
-            #print buttonObj.handleEvent(event)
-            #buttonObj.handleEvent(event)
-            buttonObj.draw(Window0)
-            pygame.display.update()
-            FPSCLOCK.tick(FPS)
+            
             #width_pos = 10
             #height_pos =
             card_value_generated = random.randint(LOWEST, HIGHEST)
@@ -122,11 +118,11 @@ while running:
             pygame.quit()
             sys.exit()
 
-        print buttonObj.handleEvent(event)
-        buttonObj.handleEvent(event)
+        
+        #in order to show the clicking effect, you have to draw the button instance to the surface for every event, not every CLICK(within the above if statement)!!
         buttonObj.draw(Window0)
         pygame.display.update()
-        FPSCLOCK.tick(FPS)        
+        #FPSCLOCK.tick(FPS)        
 
 
 def main():

@@ -16,16 +16,18 @@ def main():
 
     buttonHello = pygbutton.PygButton((50, 100, 200, 30), 'Hello')
     buttonToggleVis = pygbutton.PygButton((50, 50, 200, 30), 'Toggle Button Visibility')
-
+    
+    
     if platform.system() == 'Windows':
         buttonHello.font = pygame.font.SysFont('comicsansms', 20) # Unfortunately, this line will only work on Windows machines.
 
     visMode = True
-
+    
+    
     while True: # main game loop
 
         buttonHello.visible = visMode
-
+        #pygame.display.update()
         for event in pygame.event.get(): # event handling loop
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
@@ -34,7 +36,7 @@ def main():
             events = buttonToggleVis.handleEvent(event)
             if 'click' in events:
                 visMode = not visMode
-
+            #why has to call the following command??:    
             buttonHello.handleEvent(event)
 
         DISPLAYSURFACE.fill(WHITE)
