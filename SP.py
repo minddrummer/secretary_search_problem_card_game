@@ -1,7 +1,7 @@
 __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUCI'
 
 # 
-# highlight the current value that can be exploited
+# 
 # show turns used and left information
 # and also show all other information subjects need to know on the surface
 # show the value that you would get on the board for the left turns
@@ -18,10 +18,10 @@ import random
 #card value's range
 LOWEST,HIGHEST = 1, 100
 #card's width and height
-CARDWIDTH, CARDHEIHT =  40, 50
+CARDWIDTH, CARDHEIGHT =  40, 50
 BACKGROUND_COLOR  = (30, 98, 50)
 #the window's width and height
-Width, Height = 800, 600
+WIDTH, HEIGHT = 800, 600
 FPS = 30
 
 
@@ -31,15 +31,38 @@ class Rect:
     '''
     #class attributes
     Click_Times = -1
+    #Max_card_per_row = 0
+    Gap = 20
+    Initial_width_pos = 10
+    Initial_height_pos = 10
+    
+    
     def __init__(self, clicker_counter, value, surface):
-        self.width_pos, self.height_pos = self.compute_width_heigh_pos(clicker_counter)
+        
         self.card_value = value
         self.cardwidth = CARDWIDTH
-        self.cardheight = CARDHEIHT
+        self.cardheight = CARDHEIGHT
         self.surface = surface
         self.click_time = clicker_counter
         #above is an instance attribute
         Rect.Click_Times += 1
+        #initialize the max number of card per row
+        Rect.Max_card_per_row = Rect.compute_max_num_card_per_row()
+        #print  Rect.Max_card_per_row
+        self.width_pos, self.height_pos = self.compute_width_heigh_pos(clicker_counter)
+        #print self.width_pos, self.height_pos
+   
+    @staticmethod
+    def compute_max_num_card_per_row():
+        '''
+        static method to compute the number of card per row
+        '''
+        i = 1
+        while Rect.Initial_width_pos + i*(Rect.Gap + CARDWIDTH) <= WIDTH :
+            i += 1
+        return (i - 1)
+        
+        
         
     def compute_width_heigh_pos(self, click_counter):
         '''
@@ -48,11 +71,19 @@ class Rect:
         And also have to switch to the next lines when necessary!!!!!
         
         '''
-        initial_width_pos = 10
-        initial_height_pos = 10
-        gap = 20
-        rect_width_pos = initial_width_pos + click_counter*(CARDWIDTH+gap)
-        rect_height_pos = initial_height_pos
+        # assign the class attributes to the local variables
+        initial_width_pos = Rect.Initial_width_pos
+        initial_height_pos = Rect.Initial_height_pos
+        gap = Rect.Gap
+        
+        #click_counter is starting from 0; so donot have to add 1 to the end in the following line
+        num_card_on_left = (click_counter % Rect.Max_card_per_row) 
+        num_row_on_top = (click_counter // Rect.Max_card_per_row)
+        
+        #compute the starting position for each card instance
+        rect_width_pos = initial_width_pos + num_card_on_left*(CARDWIDTH+gap)
+        rect_height_pos = initial_height_pos + num_row_on_top*(CARDHEIGHT+gap)
+        
         return rect_width_pos,rect_height_pos
         
         
@@ -60,9 +91,9 @@ class Rect:
         #print 'Rect.Click_Times', Rect.Click_Times
         #print 'self.click_time', self.click_time
         if self.click_time == Rect.Click_Times:
-            pygame.draw.rect(self.surface, (255,255,255), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIHT), 0)
+            pygame.draw.rect(self.surface, (255,255,255), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
         else:
-            pygame.draw.rect(self.surface, (150,150,150), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIHT), 0)
+            pygame.draw.rect(self.surface, (150,150,150), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
             
     def draw(self):
         '''
@@ -72,7 +103,7 @@ class Rect:
         Rect = (self.width_pos, self.height_pos, self.cardwidth, self.cardheight)
         self.regular_or_highlight()
         #the following code is drawing a frame of the card
-        pygame.draw.rect(self.surface, (6,113,148), (self.width_pos + 3,self.height_pos + 3, CARDWIDTH-6, CARDHEIHT-6), 3)
+        pygame.draw.rect(self.surface, (6,113,148), (self.width_pos + 3,self.height_pos + 3, CARDWIDTH-6, CARDHEIGHT-6), 3)
         self.draw_card_value()
         pygame.display.flip()
         #you can actually only update part of the surface, using a rect tuple
@@ -94,7 +125,7 @@ class Rect:
 pygame.init()
 #Do we need this clock object in this game??
 #FPSCLOCK = pygame.time.Clock()
-Window0 = pygame.display.set_mode((Width, Height))
+Window0 = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('A Decision Task')
 Window0.fill(BACKGROUND_COLOR)
 pygame.display.flip()
