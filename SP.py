@@ -23,7 +23,46 @@ BACKGROUND_COLOR  = (30, 98, 50)
 #the window's width and height
 WIDTH, HEIGHT = 800, 600
 FPS = 30
+TURN = 20
 
+class Game_info:
+    
+    def __init__(self, num_card, current_value_set, surface):
+        self.turn = num_card
+        self.left_turn = TURN - self.turn
+        if len(current_value_set) == 0:
+            self.current_value = 'Not Applicable'
+        else:
+            self.current_value = current_value_set[-1]
+        self.surface = surface
+        
+
+        
+    def draw_game_info(self):
+        game_info_text1 = 'The current turn is:'
+        game_info_text1 += str(self.turn)
+        #game_info_text += '\n'
+        game_info_text2 = 'The number of turns left is:'
+        game_info_text2 += str(self.left_turn)
+        #game_info_text += '\n'
+        game_info_text3 = 'The current card value available is:'
+        game_info_text3 += str(self.current_value)
+        
+        #first draw the area for text, and erase the previous game info
+        self.surface.fill(pygame.Color('white'), (300,500,500,90))
+        #draw on the surface
+        font_instance = pygame.font.SysFont('helvetica',25)
+        #helvetica, times
+        #font_instance = pygame.font.SysFont("comicsansms",25)
+        #text1 is a new surface
+        text1 = font_instance.render(game_info_text1,True,(0,0,0))     
+        text2 = font_instance.render(game_info_text2,True,(0,0,0))
+        text3 = font_instance.render(game_info_text3,True,(0,0,0))
+        #render the new surface on the game interface
+        self.surface.blit(text1, (300,500))
+        self.surface.blit(text2, (300,530))
+        self.surface.blit(text3, (300,560))
+        #self.surface.blit(text1, (self.width_pos, self.height_pos))        
 
 class Rect:
     '''
@@ -35,7 +74,8 @@ class Rect:
     Gap = 20
     Initial_width_pos = 10
     Initial_height_pos = 10
-    
+    Num_card = 0
+    Card_value_set = []
     
     def __init__(self, clicker_counter, value, surface):
         
@@ -45,13 +85,22 @@ class Rect:
         self.surface = surface
         self.click_time = clicker_counter
         #above is an instance attribute
+        #Click_Times is starting from 0
         Rect.Click_Times += 1
+        #Num_card is from 0, and recording the number of card flipped over
+        Rect.Num_card  += 1
+        #put all the card value into a list
+        Rect.Card_value_set.append(self.card_value)
         #initialize the max number of card per row
         Rect.Max_card_per_row = Rect.compute_max_num_card_per_row()
         #print  Rect.Max_card_per_row
         self.width_pos, self.height_pos = self.compute_width_heigh_pos(clicker_counter)
         #print self.width_pos, self.height_pos
-   
+    
+    @classmethod
+    def get_current_value(cls):
+        return cls.Card_value_set[-1]
+    
     @staticmethod
     def compute_max_num_card_per_row():
         '''
@@ -171,6 +220,8 @@ while running:
             sys.exit()
 
         
+        game_info = Game_info(Rect.Num_card, Rect.Card_value_set, Window0)
+        game_info.draw_game_info()
         #in order to show the clicking effect, you have to draw the button instance to the surface for every event, not every CLICK(within the above if statement)!!
         buttonObj.draw(Window0)
         pygame.display.update()
