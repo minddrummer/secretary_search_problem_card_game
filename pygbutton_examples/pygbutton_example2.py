@@ -36,14 +36,16 @@ def main():
             events = buttonToggleVis.handleEvent(event)
             if 'click' in events:
                 visMode = not visMode
+            buttonHello.visible = visMode
             #why has to call the following command??:    
             buttonHello.handleEvent(event)
-
+            #DISPLAYSURFACE.fill(WHITE)
+            
         DISPLAYSURFACE.fill(WHITE)
 
         buttonToggleVis.draw(DISPLAYSURFACE)
         buttonHello.draw(DISPLAYSURFACE)
-
+        #DISPLAYSURFACE.fill(WHITE)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
