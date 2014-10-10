@@ -2,11 +2,11 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 
 # 
 # 
-# show turns used and left information
-# and also show all other information subjects need to know on the surface
+# 
+# three buttons, first two and then later one.
 # show the value that you would get on the board for the left turns
 # animation of flipping over a card
-# three buttons, first two and then later one.
+# 
 
 import pygame, sys
 import math, time, string
@@ -49,7 +49,9 @@ class Game_info:
         game_info_text3 += str(self.current_value)
         
         #first draw the area for text, and erase the previous game info
-        self.surface.fill(pygame.Color('white'), (300,500,500,90))
+        
+        self.surface.fill(pygame.Color(30, 98, 50), (300,500,500,90))
+        #self.surface.fill(pygame.Color('white'), (300,500,500,90))
         #draw on the surface
         font_instance = pygame.font.SysFont('helvetica',25)
         #helvetica, times
@@ -76,6 +78,10 @@ class Rect:
     Initial_height_pos = 10
     Num_card = 0
     Card_value_set = []
+    #control whether the flip is before or post Exploration
+    #every time the game starts, this is False; every time PE decision, this is True then
+    Post_exploration = False
+    Selected_rect = None
     
     def __init__(self, clicker_counter, value, surface):
         
@@ -97,6 +103,11 @@ class Rect:
         self.width_pos, self.height_pos = self.compute_width_heigh_pos(clicker_counter)
         #print self.width_pos, self.height_pos
     
+    @classmethod
+    def set_post_exp_and_sel_rect(cls, post_exploration = False, selected_rect = None):
+        cls.Post_exploration = post_exploration
+        cls.Selected_rect = selected_rect
+        
     @classmethod
     def get_current_value(cls):
         return cls.Card_value_set[-1]
@@ -139,17 +150,29 @@ class Rect:
     def regular_or_highlight(self):
         #print 'Rect.Click_Times', Rect.Click_Times
         #print 'self.click_time', self.click_time
-        if self.click_time == Rect.Click_Times:
-            pygame.draw.rect(self.surface, (255,255,255), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
+        '''
+        Before Decision, the current value is highlighted, and the previous value is shaded
+        
+        After decision, the selected value is highlighted, and the PE cards are shaded
+        
+        Rect.Post_exploration is originally False, after decision,set it as True. and Every new game should initialize it as False again
+        '''
+        if Rect.Post_exploration == False:
+            if self.click_time == Rect.Click_Times:
+                pygame.draw.rect(self.surface, (255,255,255), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
+            else:
+                pygame.draw.rect(self.surface, (150,150,150), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
         else:
-            pygame.draw.rect(self.surface, (150,150,150), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
-            
+            if self == Rect.Selected_rect:
+                pygame.draw.rect(self.surface, (255,255,255), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
+            else:
+                pygame.draw.rect(self.surface, (150,150,150), (self.width_pos,self.height_pos,CARDWIDTH,CARDHEIGHT), 0)
+                
     def draw(self):
         '''
         draw the rect instance and update its corresponding value
         '''
-        color = (0, 139, 0)
-        Rect = (self.width_pos, self.height_pos, self.cardwidth, self.cardheight)
+        
         self.regular_or_highlight()
         #the following code is drawing a frame of the card
         pygame.draw.rect(self.surface, (6,113,148), (self.width_pos + 3,self.height_pos + 3, CARDWIDTH-6, CARDHEIGHT-6), 3)
@@ -181,8 +204,12 @@ pygame.display.flip()
 Deck = pygame.image.load('deck.jpg')
 Deck1 = pygame.transform.smoothscale(Deck, (60,80))
 Window0.blit(Deck1, (0,520))
-buttonObj = pygbutton.PygButton((70, 500, 90, 30), 'Flip Over')
-buttonObj.draw(Window0)
+button_Before_Ex = pygbutton.PygButton((70, 490, 150, 30), 'Flip A New Card')
+button_Decision = pygbutton.PygButton((70, 530, 150, 30), 'Make A Decision')
+button_Next = pygbutton.PygButton((70, 570, 150, 30), 'Next Round')
+button_Before_Ex.draw(Window0)
+button_Decision.draw(Window0)
+button_Next.draw(Window0)
 pygame.display.flip()
 
 
@@ -195,8 +222,8 @@ click_counter = 0
 rect_set = []
 while running:
     for event in pygame.event.get():
-        # buttonObj.handleEvent(event) is a queue
-        if 'click' in buttonObj.handleEvent(event):
+        # button_Before_Ex.handleEvent(event) is a queue
+        if 'click' in button_Before_Ex.handleEvent(event):
             
             #width_pos = 10
             #height_pos =
@@ -214,6 +241,27 @@ while running:
             
             
             click_counter += 1
+            
+        if 'click' in button_Decision.handleEvent(event):
+            '''
+            after click on the Decision button, the choose value will be fixed
+            the PE card should be valued
+            and this button should NOT work again--disabled
+            and the next round button would be activated
+            '''
+            Rect.set_post_exp_and_sel_rect(post_exploration = True, selected_rect = rect_set[-1])
+            #pygame.draw.rect(Window0, (30, 98, 50), (70, 530, 150, 30), 0)
+            #pygame.draw.rect(Window0, (0, 0, 0), (70, 530, 150, 30), 2)
+            #Window0.fill(pygame.Color(0, 0, 0), (70, 530, 180, 30))
+            #Window0.fill(pygame.Color(30, 98, 50), (70, 530, 150, 30))
+           
+            # make the Decision button disable; draw colors or rect doesnot work
+            button_Decision._visible = False
+            #set the button_Next active
+            #
+        if 'click' in button_Next.handleEvent(event):
+            pass            
+
         if event.type == pygame.QUIT:
             running = False
             pygame.quit()
@@ -223,7 +271,8 @@ while running:
         game_info = Game_info(Rect.Num_card, Rect.Card_value_set, Window0)
         game_info.draw_game_info()
         #in order to show the clicking effect, you have to draw the button instance to the surface for every event, not every CLICK(within the above if statement)!!
-        buttonObj.draw(Window0)
+        button_Before_Ex.draw(Window0)
+        button_Decision.draw(Window0)
         pygame.display.update()
         #FPSCLOCK.tick(FPS)        
 
