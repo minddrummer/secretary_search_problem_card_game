@@ -12,6 +12,7 @@ import pygame, sys
 import math, time, string
 import pygbutton
 import random
+#import pyganim
 
 #######experiment settings###########################
 #uniform distribution values, L and H are closed interval
@@ -24,6 +25,11 @@ BACKGROUND_COLOR  = (30, 98, 50)
 WIDTH, HEIGHT = 800, 600
 FPS = 30
 TURN = 20
+#ANIMATION_ON = True
+
+
+
+
 
 class Game_info:
     
@@ -196,11 +202,11 @@ class Rect:
 
 pygame.init()
 #Do we need this clock object in this game??
-#FPSCLOCK = pygame.time.Clock()
+FPSCLOCK = pygame.time.Clock()
 Window0 = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('A Decision Task')
 Window0.fill(BACKGROUND_COLOR)
-pygame.display.flip()
+#pygame.display.flip()
 Deck = pygame.image.load('deck.jpg')
 Deck1 = pygame.transform.smoothscale(Deck, (60,80))
 Window0.blit(Deck1, (0,520))
@@ -216,12 +222,12 @@ pygame.display.flip()
 
 
 
-
 running = True
 click_counter = 0
 rect_set = []
 buttonDecision_visMode = True
 button_Next_visMode = False
+
 while running:
 
     for event in pygame.event.get():
@@ -240,9 +246,9 @@ while running:
                 rect_set[-1].draw()
             rect.draw()
             rect_set.append(rect)
+            #Window0.scroll will move the surface 
+            #Window0.scroll(40,-70)
             #print rect_set
-            
-            
             click_counter += 1
             
         if 'click' in button_Decision.handleEvent(event):
@@ -273,7 +279,8 @@ while running:
                 #button_Next_visMode = True
                 #set the button_Next active
                 button_Decision.visible = buttonDecision_visMode
-                button_Next.visible = button_Next_visMode            
+                button_Next.visible = button_Next_visMode  
+                
         
         if 'click' in button_Next.handleEvent(event):
             '''
@@ -285,7 +292,7 @@ while running:
             running = False
             pygame.quit()
             sys.exit()
-
+    
         
     game_info = Game_info(Rect.Num_card, Rect.Card_value_set, Window0)
     game_info.draw_game_info()
@@ -294,7 +301,7 @@ while running:
     button_Decision.draw(Window0)
     button_Next.draw(Window0)
     pygame.display.update()
-    #FPSCLOCK.tick(FPS)        
+    FPSCLOCK.tick(FPS)        
 
 
 def main():
