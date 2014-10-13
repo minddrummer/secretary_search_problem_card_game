@@ -1,12 +1,19 @@
 __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUCI, python2.7.3, Win64'
 
-# 
-# 
-# 
-# 
-# 
-# animation of flipping over a card
-# 
+# before decision search cost is a fixed value as 5
+# No limit on the number of PE in each trial
+# all the disitrbutions are uniform
+# Black 25-100-175 as no information disclosure
+# white 50-100-150
+# Turns = 20
+# trials = 48 in total, each has 12 trials
+# all the 48 trials shuffled into a random order
+# all other distributions:
+# 40-80-120(0.5*80--1.5*80) ;20-80-140(0.25*80--1.75*80)
+# 80-160-240 ; 40-160-280 ; 100-200-300 ;50-200-350 ; 120-240-360 ;60-240-420
+# 150-300-450; 75-300-525
+
+
 
 import pygame, sys
 import math, time, string
@@ -17,7 +24,7 @@ import random
 #######experiment settings###########################
 #uniform distribution values, L and H are closed interval
 #card value's range
-LOWEST,HIGHEST = 1, 100
+LOWEST,HIGHEST = 25, 170
 #card's width and height
 CARDWIDTH, CARDHEIGHT =  40, 50
 BACKGROUND_COLOR  = (30, 98, 50)
@@ -207,9 +214,11 @@ Window0 = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('A Decision Task')
 Window0.fill(BACKGROUND_COLOR)
 #pygame.display.flip()
-Deck = pygame.image.load('deck.jpg')
-Deck1 = pygame.transform.smoothscale(Deck, (60,80))
-Window0.blit(Deck1, (0,520))
+#Deck = pygame.image.load('deck.jpg')
+#Deck1 = pygame.transform.smoothscale(Deck, (60,80))
+#Window0.blit(Deck1, (0,520))
+pygame.draw.rect(Window0,(31,31,31), (0,520, 60, 80), 0)
+pygame.draw.rect(Window0, (6,113,148), (5,525,50,70), 3)
 button_Before_Ex = pygbutton.PygButton((70, 490, 150, 30), 'Flip A New Card')
 button_Decision = pygbutton.PygButton((70, 530, 150, 30), 'Make A Decision')
 button_Next = pygbutton.PygButton((70, 570, 150, 30), 'Next Round')
