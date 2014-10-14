@@ -13,7 +13,8 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 # 80-160-240 ; 40-160-280 ; 100-200-300 ;50-200-350 ; 120-240-360 ;60-240-420
 # 150-300-450; 75-300-525
 
-
+## 
+## save the data 
 
 import pygame, sys
 import math, time, string
@@ -105,6 +106,7 @@ class Rect:
         self.click_time = clicker_counter
         #above is an instance attribute
         #Click_Times is starting from 0
+        #Click_Times += 1???---local variable 'Click_Times' referenced before assignment!!!  The python frame and variables apply here in class and its methods. Click_Times will be a local variable, rather than a global variable in terms of the Rect class
         Rect.Click_Times += 1
         #Num_card is from 0, and recording the number of card flipped over
         Rect.Num_card  += 1
@@ -116,6 +118,20 @@ class Rect:
         self.width_pos, self.height_pos = self.compute_width_heigh_pos(clicker_counter)
         #print self.width_pos, self.height_pos
     
+    @staticmethod
+    def reset_Rect_Class_attributes():
+        '''
+        reset the class attributes
+        NOTE THAT, YOU HAVE TO refer to Rect. , otherwise, all the variables below would be treated as local variables within this method
+        '''
+        Rect.Click_Times = -1
+        Rect.Num_card = 0
+        Rect.Card_value_set = []
+        #control whether the flip is before or post Exploration
+        #every time the game starts, this is False; every time PE decision, this is True then
+        Rect.Post_exploration = False
+        Rect.Selected_rect = None        
+        
     @classmethod
     def set_post_exp_and_sel_rect(cls, post_exploration = False, selected_rect = None):
         cls.Post_exploration = post_exploration
@@ -240,6 +256,10 @@ button_Next_visMode = False
 while running:
 
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+            sys.exit()        
         # button_Before_Ex.handleEvent(event) is a queue
         if 'click' in button_Before_Ex.handleEvent(event):
             
@@ -294,14 +314,22 @@ while running:
         if 'click' in button_Next.handleEvent(event):
             '''
             reset the game 
+            write a re-set function to do this??
             '''
-            pass            
-
-        if event.type == pygame.QUIT:
-            running = False
-            pygame.quit()
-            sys.exit()
-    
+            Window0.fill(BACKGROUND_COLOR)
+            button_Next_visMode = False
+            buttonDecision_visMode = True
+            button_Decision.visible = buttonDecision_visMode
+            button_Next.visible = button_Next_visMode             
+            #change the setting of Rect attributes, might not be the most proper way, should set some method in Rect class
+            Rect.reset_Rect_Class_attributes()
+            
+            rect_set = []
+            click_counter = 0
+            pygame.draw.rect(Window0,(31,31,31), (0,520, 60, 80), 0)
+            pygame.draw.rect(Window0, (6,113,148), (5,525,50,70), 3)            
+            pygame.display.update()
+            
         
     game_info = Game_info(Rect.Num_card, Rect.Card_value_set, Window0)
     game_info.draw_game_info()
