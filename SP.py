@@ -15,11 +15,13 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 
 ## 
 ## save the data 
+## how to properly quit the csv writer object and save the data with integrity
 
 import pygame, sys
 import math, time, string
 import pygbutton
 import random
+import csv
 #import pyganim
 
 #######experiment settings###########################
@@ -34,8 +36,18 @@ WIDTH, HEIGHT = 800, 600
 FPS = 30
 TURN = 20
 #ANIMATION_ON = True
+SUBJ_ID = '007'
 
 
+def writeinit(subjectid):
+    """preps the file object, writes the initial header line"""
+    global csvwriter    
+    filename = subjectid + "-data.csv"
+    fileobj = open(filename, 'wb')
+    csvwriter = csv.writer(fileobj)
+    header = ['subjectid','trial','turn','explore0_exploit1','switch_exploit?','switch_PE?', 'timeofclick','timesincelastclick','numberofcards','cardvalue','exploitCards','maxvalueontable','totalpoint']
+    csvwriter.writerow(header)
+    #fileobj.close()
 
 
 
@@ -242,8 +254,7 @@ button_Before_Ex.draw(Window0)
 #button_Decision.draw(Window0)
 #button_Next.draw(Window0)
 pygame.display.flip()
-
-
+writeinit(SUBJ_ID)
 
 
 
@@ -258,6 +269,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            
             pygame.quit()
             sys.exit()        
         # button_Before_Ex.handleEvent(event) is a queue
@@ -278,6 +290,22 @@ while running:
             #Window0.scroll will move the surface 
             #Window0.scroll(40,-70)
             #print rect_set
+            
+            
+            #write into the csv file
+            exp_turn = click_counter
+            exp_trial = 1
+            ##the right way is to set selected as an instance attribute!
+            if rect == Rect.Selected_rect:
+                exp_picked_rect = 1
+            else:
+                exp_picked_rect = 0
+            exp_ex_ex = 0
+            row = [SUBJ_ID, exp_trial, exp_turn, exp_ex_ex, rect.card_value,exp_picked_rect]
+            csvwriter.writerow(row)
+            
+            
+            ###########################
             click_counter += 1
             
         if 'click' in button_Decision.handleEvent(event):
@@ -309,6 +337,8 @@ while running:
                 #set the button_Next active
                 button_Decision.visible = buttonDecision_visMode
                 button_Next.visible = button_Next_visMode  
+                
+                           
                 
         
         if 'click' in button_Next.handleEvent(event):
