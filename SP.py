@@ -1,5 +1,5 @@
 __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUCI, python2.7.3, Win64'
-
+#---------experiment setting info-----------------
 # before decision search cost is a fixed value as 5
 # No limit on the number of PE in each trial
 # all the disitrbutions are uniform
@@ -12,16 +12,24 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 # 40-80-120(0.5*80--1.5*80) ;20-80-140(0.25*80--1.75*80)
 # 80-160-240 ; 40-160-280 ; 100-200-300 ;50-200-350 ; 120-240-360 ;60-240-420
 # 150-300-450; 75-300-525
-
-## 
-## save the data 
-## how to properly quit the csv writer object and save the data with integrity
+# -------------guidelines for the coding -----------------
+# first make the whole procedures integral, then if necessary adding the try part
+# add instruction windows and interface
+# modulize the runing part, add trials and conditions
+# add function to tracking clicking time!
+# add details about the experiment above
+# save the data 
+# how to properly quit the csv writer object and save the data with integrity
+# ----------------------to do list---------------------------------
+# check the prompt window from Tkinter
+# revise the prompt window on the instruction and also on INTERFACE
 
 import pygame, sys
 import math, time, string
 import pygbutton
 import random
 import csv
+from Tkinter import *
 #import pyganim
 
 #######experiment settings###########################
@@ -36,9 +44,44 @@ WIDTH, HEIGHT = 800, 600
 FPS = 30
 TURN = 20
 #ANIMATION_ON = True
-SUBJ_ID = '007'
 
 
+
+
+def introprompt():
+    """asks the user to read a document and type in a subject id, then click ok."""
+    def saveclose():
+        global _Subject_id
+        _Subject_id = entry.get()
+        #print id
+        #root.quit()
+    introtext = "Welcome.   In this experiment, your goal is to choose a set of numbered cards so that you get \n\
+the **highest total score** that you can in each game. You have a deck of cards at the bottom of the screen, \n\
+and on each turn, you can pick a new card from that deck by clicking on it,or you can pick one of the cards\n\
+you have already gotten from the deck, by clicking on that card in the set of cards displayed above the deck.\n\
+If you pick a new card from the deck, you will get the number of points on that card added to your score, and\n\
+if you pick an old card shown on the screen, you will get the number of points shown on it--but then that card's\n\
+value will decrease by 3 points. If you choose that card next time, you will get the decreased number of points\n\
+added to your score, and the value will go down by another 3 points.  The cards in the deck have numbers between\n\
+1 and 99, with each number being equally likely to turn up. In each game, the total number of turns is uncertain \n\
+and may vary from game to game. And you will get to play the game 32 times--the first-two game is a practice. The \n\
+highest value of cards on your table will be painted red. Your total score for the current game is shown at the \n\
+bottom of the screen, along with how many turns you already have had, and what numbers you have picked so far.  \n\
+\n\
+At the end of each game, you will be told your total amount of points and total number of turns at that game. \n\
+Please ask if you have any questions now, or give it a try!\n"
+    root = Tk()
+    root.title = "Instructions"
+    label = Label(root, text = introtext, font=("Helvetica", 16),justify=LEFT,anchor=NE)
+    label.pack()
+    entry = Entry(root)
+    #entry.insert(0, "Type Subject ID Here.")
+    entry.pack()
+    button = Button(root, text = "Experimenter: Enter Subject ID above and click here to save it, then click the upper right red X button of THIS window to start the game.", font=("Helvetica", 12), command = saveclose)
+    button.pack()
+    root.mainloop()
+    
+    
 def writeinit(subjectid):
     """preps the file object, writes the initial header line"""
     global csvwriter    
@@ -245,6 +288,9 @@ Window0.fill(BACKGROUND_COLOR)
 #Deck = pygame.image.load('deck.jpg')
 #Deck1 = pygame.transform.smoothscale(Deck, (60,80))
 #Window0.blit(Deck1, (0,520))
+introprompt()
+writeinit(_Subject_id)
+
 pygame.draw.rect(Window0,(31,31,31), (0,520, 60, 80), 0)
 pygame.draw.rect(Window0, (6,113,148), (5,525,50,70), 3)
 button_Before_Ex = pygbutton.PygButton((70, 490, 150, 30), 'Flip A New Card')
@@ -254,7 +300,6 @@ button_Before_Ex.draw(Window0)
 #button_Decision.draw(Window0)
 #button_Next.draw(Window0)
 pygame.display.flip()
-writeinit(SUBJ_ID)
 
 
 
@@ -301,7 +346,7 @@ while running:
             else:
                 exp_picked_rect = 0
             exp_ex_ex = 0
-            row = [SUBJ_ID, exp_trial, exp_turn, exp_ex_ex, rect.card_value,exp_picked_rect]
+            row = [_Subject_id, exp_trial, exp_turn, exp_ex_ex, rect.card_value,exp_picked_rect]
             csvwriter.writerow(row)
             
             
