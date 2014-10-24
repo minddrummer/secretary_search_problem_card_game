@@ -20,10 +20,13 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 # add details about the experiment above
 # save the all NECESSARY data 
 # 
-# ----------------------to do list---------------------------------
-# the right way is to set selected as an instance attribute! to save the decision card value
-# modulize the runing part, add conditions and draw the condition information on the surface
-# :: set the condition information as one attribute to the rect instance?
+# ------------------------to do list---------------------------------
+# 1) add time tracking to the data writing
+# 2)modulize the runing part, add conditions and draw the condition information on the surface
+# :: set the condition information as one attribute to the rect instance? MAYBE....
+# 
+
+
 
 import pygame, sys
 import math, time, string
@@ -74,6 +77,8 @@ def introprompt():
 	button0 = Button(root, text = "Save Subject ID", font=("Helvetica", 12), command = saveclose)
 	button0.pack()
 	button1 = Button(root, text = "Start the Game", font=("Helvetica", 12), command = root.destroy)
+	#NOT add button1 and click on close window will work; 
+	#if you use root.quit, then the interface disabled, but it still will be shown, and the close window button not working, note the difference
 	button1.pack()
 	root.mainloop()
 
@@ -81,16 +86,20 @@ def post_game_prompt():
 	'''
 	after the game, tell subjects the game information briefly and ask them go to the experimenter
 	'''
-		
-	introtext = '''Congratulations!  You finish the game! Please turn to the experimenter
+	def quit_game_sys():
+		root.destroy
+		#print 'whether it will be carried out here after root.destroy? YES!!'
+		sys.exit()
+
+	end_text = '''Congratulations!  You finish the game! Please turn to the experimenter
 	for further instructions!'''
 	root = Tk()
 	root.resizable(width=False, height=False)
 	root.geometry('{}x{}'.format(1000,800))
 	root.title = "Game Information"
-	label = Label(root, text = introtext, font=("Helvetica", 16),justify=LEFT,anchor=NE)
+	label = Label(root, text = end_text, font=("Helvetica", 16),justify=LEFT,anchor=NE)
 	label.pack()
-	button1 = Button(root, text = "Quit the Game", font=("Helvetica", 12), command = root.destroy)
+	button1 = Button(root, text = "Quit the Game", font=("Helvetica", 12), command = quit_game_sys)
 	button1.pack()
 	root.mainloop()
 
@@ -187,6 +196,8 @@ class Rect:
 		self.cardheight = CARDHEIGHT
 		self.surface = surface
 		self.click_time = clicker_counter
+		#selected_or_not means whether subjs picked this card, 0 means NO and 1 means YES
+		self.selected_or_not = 0
 		#above is an instance attribute
 		#Click_Times is starting from 0
 		#Click_Times += 1???---local variable 'Click_Times' referenced before assignment!!!  The python frame and variables apply here in class and its methods. Click_Times will be a local variable, rather than a global variable in terms of the Rect class
@@ -389,12 +400,8 @@ while running:
 			#write into the csv file
 			exp_turn = click_counter
 			##the right way is to set selected as an instance attribute!
-			if rect == Rect.Selected_rect:
-				exp_picked_rect = 1
-			else:
-				exp_picked_rect = 0
-			exp_ex_ex = 0
-			row = [_Subject_id, exp_trial, exp_turn, exp_ex_ex, rect.card_value,exp_picked_rect]
+			
+			row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not]
 			_Csvwriter.writerow(row)
 			
 			
@@ -413,6 +420,16 @@ while running:
 			if len(rect_set) == 0:
 				pass
 			else:
+				#save the selected card data's attributes AGAIN in the data file, for one new row
+				#set the current rect been selected as 1: directly or could create a method in the class
+				rect.selected_or_not = 1
+				# there is absolute 'turn' meaning for selection/exploitation time
+				# so keep exp_turn the same, easy to tell when the selection happens and at which turn
+				# also keep rect.card_value the same
+
+				row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not]
+				_Csvwriter.writerow(row)
+
 				Rect.set_post_exp_and_sel_rect(post_exploration = True, selected_rect = rect_set[-1])
 				# make the Decision button disable; draw colors or rect on it not working; have to cover the previous drawn Decsion button area, and draw a new invisiable button onto Window0
 				Window0.fill(BACKGROUND_COLOR, (60, 520, 200, 40))
@@ -446,9 +463,11 @@ while running:
 				_Fileobj.close()
 				pygame.quit()
 				post_game_prompt()
-				#yes, from the below line:it will prompt the Tkinter loop and until you kill it, the following statement wouldnot be executed
+				#yes, from the below line:it will prompt the Tkinter loop forever because of the 'root.mainloop()'
+				#and before you kill it, the following statement would NOT be executed
 				#print pygame.version.ver 
 				#most safe way to quit the system, you can actually add one button in the last prompt to quit the system
+				#in case something wrong in the prompt, add sys.exit() here so you can still safely quit the system
 				sys.exit()
 
 			draw_card_deck(Window0)
