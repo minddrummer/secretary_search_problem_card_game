@@ -24,7 +24,8 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 # 1) add time tracking to the data writing
 # 2)modulize the runing part, add conditions and draw the condition information on the surface
 # :: set the condition information as one attribute to the rect instance? MAYBE....
-# 
+
+
 
 
 
@@ -367,6 +368,14 @@ click_counter = 0
 rect_set = []
 exp_trial = 1
 
+#global timeoflastclick
+#global timeoflastclickdelta
+timeoflastclick = time.time()
+timeoflastclickdelta = 0
+
+
+
+
 
 while running:
 
@@ -400,8 +409,19 @@ while running:
 			#write into the csv file
 			exp_turn = click_counter
 			##the right way is to set selected as an instance attribute!
-			
-			row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not]
+
+			#let us say last is the recent one, and timeoflastclick is the recent happening time; and the timeoflastclickdelta is
+			#the delta time from the second recent to the recent one; first save the happening time to a transit variable, get the
+			#delta time, and then save the transit time to the timeoflastclick
+			transit_click_time = time.time()
+			timeoflastclickdelta = transit_click_time - timeoflastclick
+			timeoflastclick = transit_click_time
+			#in this way, in the output data: 1) each row's lasttime - the prevous row's will get the delta time in the same row
+			#2) for the first row, we canNOT because we didnot save the original time.time() for the last time
+			#3)from the second trial, the first row's delta time includes two parts: a) RT for clicking on the 'NEXT'button and RT for clicking on the flipover button in the following trial
+			#4)for the last trial, we canNOT record the RT for clicking on the NEXT Round button(when the game is quitting), SO for study 'NEXT' RT, just exclude 1s row of the first trial
+
+			row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not, timeoflastclick, timeoflastclickdelta]
 			_Csvwriter.writerow(row)
 			
 			
@@ -426,8 +446,10 @@ while running:
 				# there is absolute 'turn' meaning for selection/exploitation time
 				# so keep exp_turn the same, easy to tell when the selection happens and at which turn
 				# also keep rect.card_value the same
-
-				row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not]
+				transit_click_time = time.time()
+				timeoflastclickdelta = transit_click_time - timeoflastclick
+				timeoflastclick = transit_click_time
+				row = [_Subject_id, exp_trial, exp_turn, rect.card_value, rect.selected_or_not,timeoflastclick, timeoflastclickdelta]
 				_Csvwriter.writerow(row)
 
 				Rect.set_post_exp_and_sel_rect(post_exploration = True, selected_rect = rect_set[-1])
