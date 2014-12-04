@@ -1,4 +1,5 @@
-# generate the uniform distribution for the experiment
+# this code is to generate the uniform distribution for the experiment
+# this code has been put in the main SP.py file
 # the values are 25,50,75,100,125,15 to 1000 so that (X-d)> 0, X is the mean,  d is the half range of the uniform distribution
 import numpy as np
 
