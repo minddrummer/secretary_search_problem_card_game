@@ -9,7 +9,10 @@ __version__ = 'classic_secretary_problem_1.0, with pygame_version_1.9.2a0_fromUC
 # all the 48 trials shuffled into a random order
 # 
 # ------------------------to do list---------------------------------
-# 
+# 1) every deck has a range of 80
+# 2) max number of turn is 80
+# 3) 24 different colors for the 24 unique decks
+# 4) payment message
 
 
 

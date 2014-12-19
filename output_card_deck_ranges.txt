@@ -1,0 +1,14 @@
+for each (), the first one is the mean, and the second one is the half of the range. So, for example, for (125,100), the range is actually [25,225]
+
+for the blue and yellow decks:
+[(125, 100), (500, 375), (600, 225), (650, 225), (1000, 975), (125, 25), (300, 175), (500, 150), (625, 25), (875, 250), (375, 125), (250, 100)]
+
+for the black deck:
+(150,50)
+
+for the white deck:
+(100,50)
+
+But, as we discussed before, we decided to reset all the value ranges to be 80, because in the python code, there are 80 cards that could be drawn at most.
+I think you should change this ¡¯80¡¯ according to the VB programming environment.
+
